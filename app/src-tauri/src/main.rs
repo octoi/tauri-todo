@@ -3,15 +3,12 @@
     windows_subsystem = "windows"
 )]
 
-mod database;
-
 use database::init_database;
 
+mod database;
+
 fn main() {
-    match init_database("sample.db") {
-        Ok(_) => println!("[+] DATABASE CONNECTED"),
-        Err(_) => println!("[-] FAILED TO CONNECT DATABASE"),
-    };
+    let db = init_database().expect("Failed to connect database");
 
     tauri::Builder::default()
         .run(tauri::generate_context!())
