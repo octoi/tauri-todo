@@ -1,15 +1,15 @@
 use rusqlite::{Connection, Result};
 use std::path::Path;
 
-pub fn init_database<P: AsRef<Path>>(database_path: P) -> Result<()> {
+pub fn connect_database<P: AsRef<Path>>(database_path: P) -> Result<Connection> {
     let conn = Connection::open(database_path)?;
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS user (
       id integer primary key,
       email text not null unique,
-      password text not null,
-      name text not null
+      name text not null,
+      password text not null
     )",
         [],
     )?;
@@ -17,12 +17,12 @@ pub fn init_database<P: AsRef<Path>>(database_path: P) -> Result<()> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS todo (
       id integer primary key,
+      user integer not null,
       title text not null unique,
-      resolved integer not null,
-      user integer not null
+      resolved integer not null
     )",
         [],
     )?;
 
-    Ok(())
+    Ok(conn)
 }
