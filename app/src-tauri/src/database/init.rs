@@ -8,7 +8,6 @@ pub fn connect_database<P: AsRef<Path>>(database_path: P) -> Result<Connection> 
         "CREATE TABLE IF NOT EXISTS user (
       id integer primary key,
       email text not null unique,
-      name text not null,
       password text not null
     )",
         [],
