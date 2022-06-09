@@ -1,4 +1,4 @@
-use bcrypt::{hash, DEFAULT_COST};
+use bcrypt::{hash, verify, DEFAULT_COST};
 use rusqlite::Connection;
 
 pub struct User {
@@ -23,8 +23,6 @@ pub fn sign_up(db: &Connection, email: String, password: String) -> Result<(), &
 }
 
 pub fn login(db: &Connection, email: String, password: String) -> Result<User, &'static str> {
-    let hashed = hash_string(password)?;
-
     let user = match get_user(db, email.clone()) {
         Ok(user) => user,
         Err(err) => {
@@ -32,10 +30,9 @@ pub fn login(db: &Connection, email: String, password: String) -> Result<User, &
         }
     };
 
-    if user.password == hashed {
-        Ok(user)
-    } else {
-        Err("Incorrect password")
+    match verify(password, &user.password) {
+        Ok(_) => return Ok(user),
+        Err(_) => return Err("Incorrect password"),
     }
 }
 
