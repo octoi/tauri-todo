@@ -43,8 +43,21 @@ pub fn read_all_todo(db: &Connection) -> Result<(), &'static str> {
     let mut todo_vec: Vec<Todo> = Vec::new();
 
     for todo in todo_iter {
-        todo_vec.push(todo);
+        match todo {
+            Ok(todo) => todo_vec.push(todo),
+            Err(_) => continue,
+        }
     }
 
     Ok(())
+}
+
+pub fn update_todo(db: &Connection, id: i32, title: String, resolved: bool) -> Result<(), &'static str> {
+    let id = format!("{}", id);
+    let resolved = format!("{}", resolved);
+
+    match db.execute("UPDATE todo SET title=(?1) resolved=(?2) WHERE id=(?3)", &[&title, &resolved, &id]) {
+        Ok(_) => return Ok(()),
+        Err(_) => return Err("Failed to update todo")
+    };
 }
