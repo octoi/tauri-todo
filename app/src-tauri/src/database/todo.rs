@@ -61,3 +61,12 @@ pub fn update_todo(db: &Connection, id: i32, title: String, resolved: bool) -> R
         Err(_) => return Err("Failed to update todo")
     };
 }
+
+pub fn delete_todo(db: &Connection, id: i32) -> Result<(), &'static str> {
+    let id = format!("{}", id);
+
+    match db.execute("DELETE FROM notes WHERE id=(?1)", &[&id]) {
+        Ok(_) => return Ok(()),
+        Err(_) => return Err("Failed to delete todo")
+    };
+}
