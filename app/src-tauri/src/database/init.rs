@@ -17,9 +17,9 @@ pub fn connect_database<P: AsRef<Path>>(database_path: P) -> Result<Connection> 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS todo (
       id integer primary key,
-      user integer not null,
+      user text not null,
       title text not null unique,
-      resolved integer not null
+      resolved text not null
     )",
         [],
     )?;
