@@ -22,7 +22,7 @@ pub fn saveTodo(db: &Connection, title: String, uid: i32) -> Result<(), &'static
     }
 }
 
-pub fn read_all_todo(db: &Connection) -> Result<(), &'static str> {
+pub fn read_all_todo(db: &Connection) -> Result<Vec<Todo>, &'static str> {
     let mut sql_query = match db.prepare("SELECT * FROM todo") {
         Ok(query) => query,
         Err(_) => return Err("Failed to query todo"),
@@ -49,7 +49,7 @@ pub fn read_all_todo(db: &Connection) -> Result<(), &'static str> {
         }
     }
 
-    Ok(())
+    Ok(todo_vec)
 }
 
 pub fn update_todo(db: &Connection, id: i32, title: String, resolved: bool) -> Result<(), &'static str> {
