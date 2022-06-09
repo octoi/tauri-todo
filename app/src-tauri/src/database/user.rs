@@ -1,19 +1,18 @@
-use bcrypt::{hash, DEFAULT_COST};
+use bcrypt::{hash, verify, DEFAULT_COST};
 use rusqlite::Connection;
 
 pub struct User {
-    id: i32,
-    name: String,
-    email: String,
+    pub id: i32,
+    pub email: String,
     password: String,
 }
 
-pub fn sign_up(db: &Connection, name: String, email: String, password: String) -> Result<(), &'static str> {
+pub fn sign_up(db: &Connection, email: String, password: String) -> Result<(), &'static str> {
     let hashed = hash_string(password)?;
 
     match db.execute(
-        "INSERT INTO user (name, email, password) VALUES (?1, ?2, ?3)",
-        &[&name, &email, &hashed],
+        "INSERT INTO user (email, password) VALUES (?1, ?2)",
+        &[&email, &hashed],
     ) {
         Ok(_) => return Ok(()),
         Err(_) => {
@@ -24,8 +23,6 @@ pub fn sign_up(db: &Connection, name: String, email: String, password: String) -
 }
 
 pub fn login(db: &Connection, email: String, password: String) -> Result<User, &'static str> {
-    let hashed = hash_string(password)?;
-
     let user = match get_user(db, email.clone()) {
         Ok(user) => user,
         Err(err) => {
@@ -33,14 +30,13 @@ pub fn login(db: &Connection, email: String, password: String) -> Result<User, &
         }
     };
 
-    if user.password == hashed {
-        Ok(user)
-    } else {
-        Err("Incorrect password")
+    match verify(password, &user.password) {
+        Ok(_) => return Ok(user),
+        Err(_) => return Err("Incorrect password"),
     }
 }
 
-fn get_user(db: &Connection, email: String) -> Result<User, &'static str> {
+pub fn get_user(db: &Connection, email: String) -> Result<User, &'static str> {
     let mut sql_query = match db.prepare("SELECT * FROM user WHERE email=(?1)") {
         Ok(statement) => statement,
         Err(_) => {
@@ -52,8 +48,7 @@ fn get_user(db: &Connection, email: String) -> Result<User, &'static str> {
         Ok(User {
             id: row.get(0)?,
             email: row.get(1)?,
-            name: row.get(2)?,
-            password: row.get(3)?,
+            password: row.get(2)?,
         })
     }) {
         Ok(user_iter) => user_iter,

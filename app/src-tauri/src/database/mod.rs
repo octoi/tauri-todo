@@ -1,17 +1,17 @@
 mod init;
-mod todo;
-mod user;
+pub mod todo;
+pub mod user;
 
 use rusqlite::Connection;
 
 pub use init::connect_database;
 
-pub fn init_database() -> Option<Connection> {
+pub fn init_database() -> Result<Connection, String> {
     match connect_database("todo.db") {
-        Ok(conn) => Some(conn),
+        Ok(conn) => Ok(conn),
         Err(err) => {
             eprintln!("{}", err);
-            None
+            Err(String::from("Failed to connect database"))
         }
     }
 }
