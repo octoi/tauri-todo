@@ -9,7 +9,7 @@ pub struct User {
 }
 
 pub fn sign_up(db: &Connection, name: String, email: String, password: String) -> Result<(), &'static str> {
-    let hashed = hash_password(password)?;
+    let hashed = hash_string(password)?;
 
     match db.execute(
         "INSERT INTO user (name, email, password) VALUES (?1, ?2, ?3)",
@@ -24,7 +24,7 @@ pub fn sign_up(db: &Connection, name: String, email: String, password: String) -
 }
 
 pub fn login(db: &Connection, email: String, password: String) -> Result<User, &'static str> {
-    let hashed = hash_password(password)?;
+    let hashed = hash_string(password)?;
 
     let user = match get_user(db, email.clone()) {
         Ok(user) => user,
@@ -71,9 +71,9 @@ fn get_user(db: &Connection, email: String) -> Result<User, &'static str> {
 }
 
 // utils
-fn hash_password(password: String) -> Result<String, &'static str> {
-    match hash(password, DEFAULT_COST) {
-        Ok(password_hash) => return Ok(password_hash),
+fn hash_string(string: String) -> Result<String, &'static str> {
+    match hash(string, DEFAULT_COST) {
+        Ok(string_hash) => return Ok(string_hash),
         Err(_) => {
             eprintln!("[-] Failed to hash password");
             return Err("Failed to hash password");
