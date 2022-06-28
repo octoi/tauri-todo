@@ -3,17 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-pub mod controller;
-pub mod database;
-
-use database::init_database;
-
 fn main() {
+    let context = tauri::generate_context!();
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![
-            controller::user::login_user,
-            controller::user::sign_up_user
-        ])
-        .run(tauri::generate_context!())
+        .run(context)
         .expect("error while running tauri application");
 }
